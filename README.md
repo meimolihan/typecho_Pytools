@@ -19,6 +19,9 @@ typecho_Pytools工具由python编写，可以快速批量的在本地发布文�
 
 >  建议在cmd中运行程序
 
+下载地址:
+
+[github](https://github.com/tanglx02/typecho_Pytools/releases/)   [gitee](https://gitee.com/tanglx02/typecho_Pytools/releases/)   [123网盘](https://www.123865.com/s/4DttVv-pF0ov)
 
 
 **方法2：** python环境运行
