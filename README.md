@@ -1,7 +1,7 @@
 # typecho_Pytools
 
 typecho_Pytools工具由python编写，可以快速批量的在本地发布文章，不需要登陆后台粘贴md文件内容，同时此工具还能查看最新的评论消息。...
-
+使用教学：[B站](https://www.bilibili.com/video/BV1YwAue5ExC/)
 ## 一、主要功能
 
 - 所有操作不用登陆博客网页后台
