@@ -4,7 +4,7 @@ import datetime
 import sys
 import os
 import shutil
-from pytypecho import Typecho,Attachment,Post
+from pytypecho import Typecho, Attachment, Post
 
 
 # 如果不存在config.json则创建
@@ -66,7 +66,8 @@ def create_directories():
             except Exception as e:
                 print(f"创建目录 {sub_dir_path} 时发生错误: {e}")
 
-#剪切文件到ok_md下
+
+# 剪切文件到ok_md下
 def move_file_with_confirmation(source_file, target_folder="ok_md/md"):
     # 检查目标文件夹是否存在，若不存在则创建
     if not os.path.exists(target_folder):
@@ -119,7 +120,7 @@ def move_file_with_confirmation(source_file, target_folder="ok_md/md"):
             print(f"移动文件时出现错误: {e}")
 
 
-#读取本地json文件中的配置
+# 读取本地json文件中的配置
 def read_config():
     # 读取 JSON 文件
     with open('config.json', 'r') as file:
@@ -127,14 +128,15 @@ def read_config():
     # 获取 url, username 和 password
     url = config.get('url')
     if url.endswith('/'):
-        url=url+"index.php/action/xmlrpc"
+        url = url + "index.php/action/xmlrpc"
     else:
-        url=url+"/index.php/action/xmlrpc"
+        url = url + "/index.php/action/xmlrpc"
     username = config.get('username')
     password = config.get('password')
-    return url,username,password
-#获取一个md文件中hexo的头部信息，并过滤出来作为文章参数
+    return url, username, password
 
+
+# 获取一个md文件中hexo的头部信息，并过滤出来作为文章参数
 def extract_metadata(file_path):
     """
     从 Markdown 文件中提取 title、date、categories 和 tags 的内容。
@@ -179,21 +181,22 @@ def extract_metadata(file_path):
                 in_tags = False
     return metadata
 
-#获取一个md文件中的文章内容
+
+# 获取一个md文件中的文章内容
 def extract_primary(file_path):
     # 打开并读取文件内容
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
 
-
     # 使用正则表达式删除 '---' 和 '---' 之间的内容
     description = re.sub(r'---.*?---', '', content, flags=re.DOTALL)
     description = re.sub(r"\[toc\]", '', description, flags=re.DOTALL)
-    return "<!--markdown-->"+description
+    return "<!--markdown-->" + description
 
-#判断是否存在大小写不一样但是名字一样的分类,直接返回结果(分类名)
+
+# 判断是否存在大小写不一样但是名字一样的分类,直接返回结果(分类名)
 def check_string_in_array(input_string):
-    #取出blog中所有的分类
+    # 取出blog中所有的分类
     blog_categories = []
     for x in te.get_categories():
         blog_categories.append(x["categoryName"])
@@ -208,7 +211,8 @@ def check_string_in_array(input_string):
     else:
         return input_string
 
-#查找指定目录下所有的.md文件
+
+# 查找指定目录下所有的.md文件
 def find_md_files(directory):
     md_files = []
     # 遍历指定目录及其子目录
@@ -220,18 +224,32 @@ def find_md_files(directory):
     return md_files
 
 
-#检查是否存在config.json
+# 检查是否存在config.json
 create_config()
 
-#检查是否存在md和hexo_md和ok_md目录
+# 检查是否存在md和hexo_md和ok_md目录
 create_directories()
 
-#读取url账号密码
-url,username,password=read_config()
+# 读取url账号密码
+url, username, password = read_config()
 
-#创建一个typecho对象
+# 创建一个typecho对象
 te = Typecho(url, username=username, password=password)
 
+
+# 处理日期解析的函数
+def parse_date(date_str):
+    try:
+        # 尝试解析 ISO 8601 格式
+        return datetime.datetime.fromisoformat(date_str)
+    except ValueError:
+        try:
+            # 尝试解析 '%Y-%m-%d %H:%M:%S' 格式
+            return datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            # 如果都解析失败，使用当前时间
+            print(f"日期解析失败: {date_str}，使用当前时间。")
+            return datetime.datetime.now()
 
 
 while True:
@@ -241,19 +259,19 @@ while True:
     print("3、删除博客数据")
     print("4、退出")
     try:
-        num=int(input("输入序号:"))
+        num = int(input("输入序号:"))
     except:
         input("输入错误重新输入!")
         continue
-    if num==1:      #md导入typecho
+    if num == 1:  # md导入typecho
         print("-----------------------1、md导入typecho-----------------------")
         print("1、传统md导入typecho")
         print("2、hexo格式md导入typecho")
         try:
-            num=int(input("输入序号："))
+            num = int(input("输入序号："))
         except:
             input("输入错误！")
-        if num == 1:    #传统md
+        if num == 1:  # 传统md
             directory = './md'  # 查找.md的目录
             md_directory = find_md_files(directory)
             if len(md_directory) == 0:
@@ -265,11 +283,11 @@ while True:
             i = 0
             input("检查是否正确，回车开始导入！")
             for md_file in md_directory:
-                i=i+1
+                i = i + 1
                 print(f"开始导入第{i}个文件，{md_file}")
                 description = extract_primary(md_file)  # 拿到文章内容
                 title = input("输入文章标题:")  # 标题
-                dateCreated = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")  # 发表时间
+                dateCreated = parse_date(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))  # 发表时间
                 categories = input("输入分类：")
                 categories = check_string_in_array(categories)  # 检查分类大小写bug
                 mt_keywords = input("输入标签(多标签用,隔开)：")  # 标签
@@ -277,10 +295,9 @@ while True:
                             description=description)
                 te.new_post(post, publish=True)  # 发布
                 print(md_file, "发布成功")
-                move_file_with_confirmation(md_file,"ok_md/md")
+                move_file_with_confirmation(md_file, "ok_md/md")
                 print("-------------------------------------------------------------")
-        elif num== 2:   #hexo格式的md
-
+        elif num == 2:  # hexo格式的md
             directory = './hexo_md'  # 查找.md的目录
             md_directory = find_md_files(directory)
             if len(md_directory) == 0:
@@ -295,7 +312,7 @@ while True:
                 description = extract_primary(md_file)  # 拿到文章内容
                 result = extract_metadata(md_file)  # 过滤出hexo参数作为typecho参数
                 title = result['title']  # 标题
-                dateCreated = datetime.datetime.strptime(result['date'], "%Y-%m-%d %H:%M:%S")  # 发表时间
+                dateCreated = parse_date(result['date'])  # 发表时间
                 categories = ', '.join(result['categories'])  # 分类
                 categories = check_string_in_array(categories)  # 检查分类大小写bug
                 mt_keywords = ', '.join(result['tags'])  # 标签
@@ -308,8 +325,7 @@ while True:
         else:
             print("输入错误！")
 
-
-    elif num==2:    #查看博客数据
+    elif num == 2:  # 查看博客数据
         while True:
             print("---------------------2、查看博客数据-----------------------")
             print("1、查看博客分类")
@@ -322,29 +338,29 @@ while True:
             except:
                 input("输入错误重新输入!")
                 continue
-            if num==1:
+            if num == 1:
                 blog_categories = []
                 for x in te.get_categories():
                     blog_categories.append(x["categoryName"])
                 print(blog_categories)
                 input("回车继续")
-            elif num==2:
+            elif num == 2:
                 for x in te.get_posts():
-                    #print(f"标题：{x[0]['title']} 序号:{x[0]['title']}")
+                    # print(f"标题：{x[0]['title']} 序号:{x[0]['title']}")
                     print(f" 文章id:{x['postid']} 标题：{x['title']} ")
-                print("一共有",len(te.get_posts()),"文章")
+                print("一共有", len(te.get_posts()), "文章")
                 input("回车继续")
-            elif num==3:
-                id=int(input("输入帖子id："))
-                tz=te.get_post(id)
+            elif num == 3:
+                id = int(input("输入帖子id："))
+                tz = te.get_post(id)
                 print(f"url：{tz['link']}")
                 print(f"标题：{tz['title']}")
                 print(f"分类：{tz['categories']}")
                 print(f"标签：{tz['mt_keywords']}")
                 print(f"作者：{tz['wp_author']}")
                 input("回车继续")
-            elif num==4:
-                tz_comment=te.get_comments()
+            elif num == 4:
+                tz_comment = te.get_comments()
                 print(f"本站一共{len(tz_comment)}条评论")
                 print('-----------------------------------------------')
                 for x in tz_comment:
@@ -353,9 +369,9 @@ while True:
                     print(f"内容:“{x['content']}”")
                     print('-----------------------------------------------')
                 input("回车继续")
-            elif num==5:
+            elif num == 5:
                 break
-    elif num == 3:  #删除博客数据
+    elif num == 3:  # 删除博客数据
         while True:
             print("---------------------3、删除博客数据-----------------------")
             print("1、删除帖子")
@@ -389,7 +405,7 @@ while True:
             else:
                 print("输入错误，重新输入！")
 
-    elif num==4:    #退出
+    elif num == 4:  # 退出
         sys.exit()
     else:
         input("输入不正确，重新输入！")

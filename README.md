@@ -1,5 +1,9 @@
 # typecho_Pytools
 
+## 2025-02-28
+
+- 【hugo】增加了hugo博客文章格式的导入，同样放在 `hexo_md` 文件夹下
+
 typecho_Pytools工具由python编写，可以快速批量的在本地发布文章，不需要登陆后台粘贴md文件内容，同时此工具还能查看最新的评论消息。...
 
 使用教学：[B站](https://www.bilibili.com/video/BV1YwAue5ExC/)
